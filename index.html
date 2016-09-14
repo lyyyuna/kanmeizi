@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset=utf-8>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>girlsssss</title>
+    </head>
+    <body>
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.17/vue.min.js"></script>
+        <!-- 新 Bootstrap 核心 CSS 文件 -->
+        <link rel="stylesheet" href="http://apps.bdimg.com/libs/bootstrap/3.3.0/css/bootstrap.min.css">
+        <script src="http://apps.bdimg.com/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="http://apps.bdimg.com/libs/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+
+      <div class="container">
+        <div class="row">
+        <div id="app">
+            <h2>{{ album_title }}</h2>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info " v-on:click="prevAlbum">上一个相册</button>
+                <button type="button" class="btn btn-info " v-on:click="shuffleAlbum">碰一下运气</button>
+                <button type="button" class="btn btn-info " v-on:click="nextAlbum">下一个相册</button>
+            </div>
+            <div>
+                <img class="img-responsive" src='{{img_url}}' v-on:click="nextPhoto"/>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn btn-info " v-on:click="prevPhoto">上一张</button>
+                <button type="button" class="btn btn-info " v-on:click="nextPhoto">下一张</button>
+            </div>
+        </div>
+        </div>
+      </div>
+
+        <script>
+            var imgpath = 'http://lihulab.qiniudn.com/abc%2F'
+            var debug = new Vue({
+                el: '#app',
+                data: {
+                    album_title: 'hello' ,
+                    album_total: 0 ,
+                    img_url: 'balabala' ,
+                    img_count: 0,
+                    album_index: 1,
+                    img_index: 0,
+                    current_album: {}
+
+                },
+                created: function(){
+                  this.initial();
+                },
+                methods: {
+                    initial: function() {
+                      var xhr = new XMLHttpRequest();
+                      var self = this;
+                      xhr.open('GET', 'http://lihulab.github.io/data/total.json');
+                      xhr.onload = function() {
+                        var dic = JSON.parse(xhr.responseText);
+                        self.album_total = dic['total'];
+                        var x = new XMLHttpRequest();
+                        x.open('GET', 'http://lihulab.github.io/data/1');
+                        x.onload = function() {
+                          var dic = JSON.parse(x.responseText);
+                          self.album_title = dic['album_title'];
+                          //self.img_url = dic['photos']['0'];
+                          self.img_index = 0;
+                          self.img_count = dic['photo_count'];
+                          self.album_index = 1;
+                          self.current_album = dic['photos'];
+                          var tmpurl = self.current_album[self.img_index];
+                          tmpurl = tmpurl.split('/').pop()
+                          tmpurl = imgpath + tmpurl;
+                          self.img_url = tmpurl;
+                        }
+                        x.send();
+                      }
+                      xhr.send();
+                    },
+
+                    prevAlbum: function() {
+                      var self = this;
+                      if (self.album_index == 1) {
+                        self.album_index = self.album_total-1;
+                      }
+                      else {
+                        self.album_index -= 1;
+                      }
+                      var x = new XMLHttpRequest();
+                      x.open('GET', 'http://lihulab.github.io/data/' + self.album_index);
+                      x.onload = function() {
+                        var dic = JSON.parse(x.responseText);
+                        self.album_title = dic['album_title'];
+                        //self.img_url = dic['photos']['0'];
+                        self.img_index = 0;
+                        self.img_count = dic['photo_count'];
+                        //self.album_index = 1;
+                        self.current_album = dic['photos'];
+                        var tmpurl = self.current_album[self.img_index];
+                        tmpurl = tmpurl.split('/').pop()
+                        tmpurl = imgpath + tmpurl;
+                        self.img_url = tmpurl;
+                      }
+                      x.send();
+                    },
+                    nextAlbum: function() {
+                      var self = this;
+                      if (self.album_index == self.album_total) {
+                        self.album_index = 1;
+                      }
+                      else {
+                        self.album_index += 1;
+                      }
+                      var x = new XMLHttpRequest();
+                      x.open('GET', 'http://lihulab.github.io/data/' + self.album_index);
+                      x.onload = function() {
+                        var dic = JSON.parse(x.responseText);
+                        self.album_title = dic['album_title'];
+                        //self.img_url = dic['photos']['0'];
+                        self.img_index = 0;
+                        self.img_count = dic['photo_count'];
+                        //self.album_index = 1;
+                        self.current_album = dic['photos'];
+                        var tmpurl = self.current_album[self.img_index];
+                        tmpurl = tmpurl.split('/').pop()
+                        tmpurl = imgpath + tmpurl;
+                        self.img_url = tmpurl;
+                      }
+                      x.send();
+                    },
+                    shuffleAlbum: function() {
+                      var self = this;
+                      self.album_index = Math.floor(Math.random()*(self.album_total)+1);
+                      var x = new XMLHttpRequest();
+                      x.open('GET', 'http://lihulab.github.io/data/' + self.album_index);
+                      x.onload = function() {
+                        var dic = JSON.parse(x.responseText);
+                        self.album_title = dic['album_title'];
+                        //self.img_url = dic['photos']['0'];
+                        self.img_index = 0;
+                        self.img_count = dic['photo_count'];
+                        //self.album_index = 1;
+                        self.current_album = dic['photos'];
+                        var tmpurl = self.current_album[self.img_index];
+                        tmpurl = tmpurl.split('/').pop()
+                        tmpurl = imgpath + tmpurl;
+                        self.img_url = tmpurl;
+                      }
+                      x.send();
+                    },
+
+                    prevPhoto: function() {
+                      var self = this;
+                      if (self.img_index == 0) {
+                        self.img_index = self.img_count-1;
+                      }
+                      else {
+                        self.img_index -= 1;
+                      }
+
+                      var tmpurl = self.current_album[self.img_index];
+                      tmpurl = tmpurl.split('/').pop()
+                      tmpurl = imgpath + tmpurl;
+                      self.img_url = tmpurl;
+                    },
+                    nextPhoto: function() {
+                      var self = this;
+                      if (self.img_index == self.img_count-1) {
+                        self.img_index = 0;
+                      }
+                      else {
+                        self.img_index += 1;
+                      }
+
+                      var tmpurl = self.current_album[self.img_index];
+                      tmpurl = tmpurl.split('/').pop()
+                      tmpurl = imgpath + tmpurl;
+                      self.img_url = tmpurl;
+                    }
+
+
+                }
+            })
+        </script>
+    </body>
+</html>
